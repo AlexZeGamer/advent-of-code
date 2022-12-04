@@ -31,6 +31,7 @@ if not os.path.exists(f'{year_directory}/{day_directory}/input.txt'):
     if r.ok:
         with open(f"{year_directory}/{day_directory}/input.txt", "wb") as f:
             f.write(r.content)
+        print(f'Downloaded input file for {year}/{day}')
     else:
         print(f'Error getting input for day {day} of year {year}')
 else:
@@ -58,5 +59,6 @@ if not os.path.exists(f"{year_directory}/{day_directory}/code.py"):
             f"\n\n\n"
             f"print(f'Part 2 : {{total}}')\n"
         )
+    print(f"Created template for {year}/{day}")
 else:
     print(f"File {year_directory}/{day_directory}/code.py already exists")
