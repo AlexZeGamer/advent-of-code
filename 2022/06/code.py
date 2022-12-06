@@ -6,29 +6,24 @@ with open('input.txt', 'r') as f:
     text = f.read().replace('\n','')
 
 
+def find_start_of_packet(data: str, sequenceSize: int) -> int:
+    """ Returns the index of the start-of-packet marker """
+    for i in range(sequenceSize, len(data)):
+        sequence = data[i-sequenceSize: i]
+
+        found = False
+        for j in range(sequenceSize):
+            for k in range(j+1,sequenceSize):
+                if sequence[j] == sequence[k]:
+                    found = True
+        
+        if not found:
+            return i
+
+
 # Part 1
-SEQUENCE_SIZE = 4
-for i in range(SEQUENCE_SIZE, len(text)):
-    sequence = text[i-SEQUENCE_SIZE: i]
-    print(sequence)
-
-    found = False
-    for j in range(4):
-        for k in range(j+1,4):
-            print(j, k)
-            print(sequence[j], sequence[k])
-            if sequence[j] == sequence[k]:
-                found = True
-    
-    if not found:
-        break
-
-print(f'Part 1 : {i}')
+print(f'Part 1 : {find_start_of_packet(text, 4)}')
 
 
 # Part 2
-total = 0
-
-
-
-print(f'Part 2 : {total}')
+print(f'Part 2 : {find_start_of_packet(text, 14)}')
