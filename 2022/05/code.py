@@ -7,35 +7,75 @@ import re
 with open('input.txt', 'r') as f:
     lines = f.readlines()
 
+def parse_stacks(lines: list) -> list:
+    """ Parse stacks from the input file """
 
-# Part 1
-message = ''
+    # number of stacks (last number of the line with the stacks numbers)
+    nbStacks = int(re.findall('(\d+)', lines[-1])[-1])
 
-def read_stacks(lines: list) -> list:
-    nbStacks = int(re.findall('(\d)', lines[-1])[-1]) 
-    stacks = [[] for i in range(nbStacks)]
+    # create empty stacks
+    stacks = [[] for _ in range(nbStacks)]
+
+    # "[X] [Y] [Z]" -> ["X", "Y", "Z"]
     for line in lines[:-1][::-1]:
         for i in range(nbStacks):
             elem = line[(i*4)+1]
             if elem != ' ':
                 stacks[i].append(elem)
+
     return stacks
 
-def read_message(stacks: list, moves: list) -> str:
+def read_message(stacks: list) -> str:
+    """ Get the final message """
+    # get le last letter (=top) of each stack
     return ''.join([stack[-1] for stack in stacks])
 
-def make_moves(stacks: list) -> list:
-    # TODO
+
+# Part 1
+def CrateMover9000(stacks: list, moves: list) -> list:
+    """ Apply the moves (of the form "move X from Y to Z") to the stacks
+        (One crate at a time : CrateMover 9000)"""
+    for move in moves:
+        # parse numbers from a string of the form "move X from Y to Z"
+        nbMoves, start, end = [int(x) for x in re.findall('\d+', move)]
+
+        # LIFO
+        for _ in range(nbMoves):
+            crate = stacks[start-1].pop()
+            stacks[end-1].append(crate)
+
     return stacks
 
-
-print(lines[lines.index('\n')+1:])
-stacks = read_stacks(lines[:lines.index('\n')])
-stacks = make_moves(stacks, lines[lines.index('\n')+1:])
+stacks = parse_stacks(lines[:lines.index('\n')])
+stacks = CrateMover9000(stacks, lines[lines.index('\n')+1:])
 message = read_message(stacks)
 
 print(f'Part 1 : {message}')
 
 
 # Part 2
+def CrateMover9001(stacks: list, moves: list) -> list:
+    """ Apply the moves (of the form "move X from Y to Z") to the stacks
+        (Multiple crate at once : CrateMover 9001)"""
+    for move in moves:
+        # parse numbers from a string of the form "move X from Y to Z"
+        nbMoves, start, end = [int(x) for x in re.findall('\d+', move)]
 
+        # FIFO
+        queue = []
+        for _ in range(nbMoves):
+            queue.append(
+                stacks[start-1].pop()
+            )
+        
+        for crate in queue[::-1]:
+            stacks[end-1].append(crate)
+
+    return stacks
+
+
+stacks = parse_stacks(lines[:lines.index('\n')])
+stacks = CrateMover9001(stacks, lines[lines.index('\n')+1:])
+message = read_message(stacks)
+
+print(f'Part 2 : {message}')
