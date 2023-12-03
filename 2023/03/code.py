@@ -2,24 +2,26 @@
 # https://adventofcode.com/2023/day/3
 # Author: Alexandre MALFREYT
 
+from typing import List
+
 DEBUG = True
 
 with open('input.txt', 'r') as f:
     engine_schematic = [line.strip() for line in f.readlines()]
 
 # Example
-engine_schematic = [
-    '467..114..',
-    '...*......',
-    '..35..633.',
-    '......#...',
-    '617*......',
-    '.....+.58.',
-    '..592.....',
-    '......755.',
-    '...$.*....',
-    '.664.598..',
-]
+# engine_schematic = [
+#     '467..114..',
+#     '...*......',
+#     '..35..633.',
+#     '......#...',
+#     '617*......',
+#     '.....+.58.',
+#     '..592.....',
+#     '......755.',
+#     '...$.*....',
+#     '.664.598..',
+# ]
 
 # Part 1
 total = 0
@@ -84,3 +86,38 @@ print(f'Part 1 : {total}')
 
 # Part 2
 total = 0
+
+def is_gear(char):
+    return char == '*'
+
+def get_numbers_adjacent(x, y, engine_schematic) -> List[int]:
+    numbers = []
+    for i in range(x-1, x+2):
+        for j in range(y-1, y+2):
+            if i < 0 or j < 0 or i >= len(engine_schematic) or j >= len(engine_schematic[0]):
+                continue
+            if is_number(engine_schematic[i][j]):
+                numbers.append(get_number(i, j, engine_schematic))
+    return set(numbers) # remove duplicates
+
+def get_number(x, y, engine_schematic) -> int:
+    y_begin = y
+    y_end = y
+    while y_begin > 0 and is_number(engine_schematic[x][y_begin-1]):
+        y_begin -= 1
+    while y_end < len(engine_schematic[x])-1 and is_number(engine_schematic[x][y_end+1]):
+        y_end += 1
+    return int(engine_schematic[x][y_begin:y_end+1])
+
+for i in range(len(engine_schematic)):
+    for j in range(len(engine_schematic[i])):
+        if is_gear(engine_schematic[i][j]):
+            print('Gear at', i, j, 'with numbers', get_numbers_adjacent(i, j, engine_schematic)) if DEBUG else None
+            numbers = get_numbers_adjacent(i, j, engine_schematic)
+            if len(numbers) >= 2:
+                sub_total = 1
+                for number in numbers:
+                    sub_total *= number
+                total += sub_total
+
+print(f'Part 2 : {total}')
