@@ -19,26 +19,15 @@ cards = [
     for card in cards
 ]
 
-cards_str = '\n'.join([
-    "Card " + str(i+1).rjust(3) + ": "
-    + ' '.join(str(c).rjust(2) for c in card['winning_numbers'])
-    + " | "
-    + ' '.join(str(c).rjust(2) for c in card['numbers_you_have'])
-    for i, card in enumerate(cards)
-]) + '\n'
-print(cards_str == text) if DEBUG else None
-print(len(cards_str), len(text)) if DEBUG else None
-print(cards_str[:10] + '|', text[:10] + '|') if DEBUG else None
-
 # Example
-cards = [
-    {"winning_numbers": [41, 48, 83, 86, 17], "numbers_you_have": [83, 86,  6, 31, 17,  9, 48, 53]},
-    {"winning_numbers": [13, 32, 20, 16, 61], "numbers_you_have": [61, 30, 68, 82, 17, 32, 24, 19]},
-    {"winning_numbers": [ 1, 21, 53, 59, 44], "numbers_you_have": [69, 82, 63, 72, 16, 21, 14,  1]},
-    {"winning_numbers": [41, 92, 73, 84, 69], "numbers_you_have": [59, 84, 76, 51, 58,  5, 54, 83]},
-    {"winning_numbers": [87, 83, 26, 28, 32], "numbers_you_have": [88, 30, 70, 12, 93, 22, 82, 36]},
-    {"winning_numbers": [31, 18, 13, 56, 72], "numbers_you_have": [74, 77, 10, 23, 35, 67, 36, 11]},
-]
+# cards = [
+#     {"winning_numbers": [41, 48, 83, 86, 17], "numbers_you_have": [83, 86,  6, 31, 17,  9, 48, 53]},
+#     {"winning_numbers": [13, 32, 20, 16, 61], "numbers_you_have": [61, 30, 68, 82, 17, 32, 24, 19]},
+#     {"winning_numbers": [ 1, 21, 53, 59, 44], "numbers_you_have": [69, 82, 63, 72, 16, 21, 14,  1]},
+#     {"winning_numbers": [41, 92, 73, 84, 69], "numbers_you_have": [59, 84, 76, 51, 58,  5, 54, 83]},
+#     {"winning_numbers": [87, 83, 26, 28, 32], "numbers_you_have": [88, 30, 70, 12, 93, 22, 82, 36]},
+#     {"winning_numbers": [31, 18, 13, 56, 72], "numbers_you_have": [74, 77, 10, 23, 35, 67, 36, 11]},
+# ]
 
 # Part 1
 total = 0
@@ -59,38 +48,46 @@ print(f'Part 1 : {total}')
 # Part 2
 total = 0
 
-def number_of_winning_numbers_in_card(card):
+memory = {}
+
+def number_of_winning_numbers_in_card(card_id):
+    if card_id in memory:
+        return memory[card_id]
+    
+    card = cards[card_id]
     count = 0
     for number in card['numbers_you_have']:
         if number in card['winning_numbers']:
             count += 1
+
+    memory[card_id] = count
     return count
 
-# cards_in_hand = cards[:] # copy
-cards_in_hand_indices = [i for i in range(len(cards))]
-# print(cards_in_hand_indices) if DEBUG else None
+def number_of_cards_remaining(number_of_each_card):
+    return sum(number_of_each_card)
 
+def next_card_to_check(number_of_each_card, i):
+    total = 0
+    for j in range(len(number_of_each_card)):
+        total += number_of_each_card[j]
+        if total > i:
+            return j
+    return None
+
+number_of_each_card = [1] * len(cards)
+card_id = 0
 i = 0
-while i < len(cards_in_hand_indices):
-    # n = number_of_winning_numbers_in_card(cards_in_hand[i])
-    n = number_of_winning_numbers_in_card(cards[cards_in_hand_indices[i]])
-    for j in range(n, 0, -1):
-        # print(cards.index(cards_in_hand[i])+j, j)
-        # index = cards.index(cards_in_hand[i])+j
-        index = cards_in_hand_indices[i]+j
-        if index >= len(cards):
-            break
-        # card_to_add = cards[index]
+while True:
+    card_id = next_card_to_check(number_of_each_card, i)
+    if card_id is None:
+        break
+    n = number_of_winning_numbers_in_card(card_id)
 
-        # print(cards_in_hand.index(cards_in_hand[i+j]), index) if DEBUG else None
-        # cards_in_hand.insert(cards_in_hand.index(cards_in_hand[i+j]), card_to_add)
-        # cards_in_hand_indices.insert(cards_in_hand.index(cards_in_hand[i+j]), index)
-        # print(i+j+1, index) if DEBUG else None
-        # cards_in_hand.insert(cards_in_hand.index(card_to_add), card_to_add)
-        cards_in_hand_indices.insert(cards_in_hand_indices.index(index), index)
+    for j in range(1, n+1):
+        copy_id = card_id + j
+        number_of_each_card[copy_id] += 1
 
-        print(cards_in_hand_indices) if DEBUG else None
-    print(f"Tour n°{i+1} : {n} cartes ajoutées, {len(cards_in_hand_indices)} cartes en main") if DEBUG and not i%1000 else None
+    print(f"Tour n°{i+1} : Carte n°{card_id}, {n} cartes ajoutées, {sum(number_of_each_card)} cartes en main") if DEBUG and not i % 100000 else None
     i += 1
 
-print(f'Part 2 : {len(cards_in_hand_indices)}')
+print(f'Part 2 : {sum(number_of_each_card)}')
