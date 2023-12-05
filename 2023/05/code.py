@@ -43,41 +43,41 @@ maps = [
 """
 
 # Example:
-seeds = [79, 14, 55, 13]
-maps = [
-    [
-        [50, 52, 48],
-        [98, 50, 2],
-    ],
-    [
-        [0, 39, 15],
-        [15, 0, 37],
-        [52, 37, 2],
-    ],
-    [
-        [0, 42, 7],
-        [7, 57, 4],
-        [11, 0, 42],
-        [53, 49, 8],
-    ],
-    [
-        [18, 88, 7],
-        [25, 18, 70],
-    ],
-    [
-        [45, 81, 19],
-        [64, 68, 13],
-        [77, 45, 23],
-    ],
-    [
-        [0, 1, 69],
-        [69, 0, 1],
-    ],
-    [
-        [56, 60, 37],
-        [93, 56, 4],
-    ]
-]
+# seeds = [79, 14, 55, 13]
+# maps = [
+#     [
+#         [50, 52, 48],
+#         [98, 50, 2],
+#     ],
+#     [
+#         [0, 39, 15],
+#         [15, 0, 37],
+#         [52, 37, 2],
+#     ],
+#     [
+#         [0, 42, 7],
+#         [7, 57, 4],
+#         [11, 0, 42],
+#         [53, 49, 8],
+#     ],
+#     [
+#         [18, 88, 7],
+#         [25, 18, 70],
+#     ],
+#     [
+#         [45, 81, 19],
+#         [64, 68, 13],
+#         [77, 45, 23],
+#     ],
+#     [
+#         [0, 1, 69],
+#         [69, 0, 1],
+#     ],
+#     [
+#         [56, 60, 37],
+#         [93, 56, 4],
+#     ]
+# ]
 
 # Part 1
 def find_appropriate_range_dicho(map: List[List[int]], value: int) -> List[int] or None:
@@ -134,7 +134,33 @@ print(f'Part 1 : {min(dests)}')
 
 
 # Part 2
-total = 0
 
+dest = None
 
-print(f'Part 2 : {total}')
+import time, humanize
+print(seeds[1:10:2])
+print(sum(seeds[1::2]))
+done = 0
+debut = time.time()
+print_delta = 100000
+for i in range(0, len(seeds), 2):
+    seed_range = seeds[i]
+    seed_range_length = seeds[i+1]
+    print(f'Seed range {seed_range}') if DEBUG and VERBOSE else None
+
+    for j in range(seed_range_length):
+        done += 1
+        print(f'{done} / {sum(seeds[1::2])}') if not done % print_delta else None
+        print(f'Estimated total time : {humanize.naturaldelta((time.time() - debut) / done * sum(seeds[1::2]), minimum_unit="seconds")}') if not done % print_delta else None
+        
+        seed = seed_range + j
+        print(f'Seed {seed}') if DEBUG and VERBOSE else None
+
+        res = seed
+        for map in maps:
+            res = a_to_b(res, map)
+
+        if dest is None or res < dest:
+            dest = res
+
+print(f'Part 2 : {dest}')
