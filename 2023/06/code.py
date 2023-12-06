@@ -38,6 +38,19 @@ print(f'Part 1 : {total}')
 # Part 2
 total = 0
 
+time = int(''.join([str(val) for val in times]))
+distance = int(''.join([str(val) for val in distances]))
+print(time, distance)
 
+number_of_ways_to_win = 0
+for time_pressing_button in range(time):
+    time = time
+    speed = time_pressing_button
+    remaining_time = time - time_pressing_button
+    distance_travelled = remaining_time * speed
+    record = distance
+    if distance_travelled > record:
+        number_of_ways_to_win += 1
+total = number_of_ways_to_win
 
 print(f'Part 2 : {total}')
