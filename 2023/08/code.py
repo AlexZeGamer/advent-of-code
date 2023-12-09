@@ -3,6 +3,7 @@
 # Author: Alexandre MALFREYT
 
 import re
+import math
 
 with open('input.txt', 'r') as f:
     lines = [line.strip() for line in f.readlines()]
@@ -51,28 +52,22 @@ def next_step(rl_instructions, paths, current_location, current_instruction):
     way = 0 if rl_instructions[current_instruction] == 'L' else 1
     return paths[current_location][way]
 
-def get_simultaneous_paths_length(rl_instructions, paths):
-    path_length = 0
-    current_locations = [l for l in paths.keys() if l[-1] == 'A']
+def find_loop_lenght(rl_instructions, paths, start_location):
+    current_location = start_location
     current_instruction = 0
-
-    previous_time = calculate_time()[0]
-    times = []
-    while not all([l[-1] == 'Z' for l in current_locations]):
-        if path_length % 1000000 == 0:
-            print(f'Path length : {path_length}')
-            previous_time, time = calculate_time(previous_time)
-            if time:
-                times.append(time)
-                avg_time = sum(times) / len(times)
-                print(f'Average time : {avg_time:.3f} s')
-
-        current_locations = [paths[l][0] if rl_instructions[current_instruction] == 'L' else paths[l][1] for l in current_locations]
-
+    i = 0
+    while current_location[-1] != 'Z':
+        current_location = next_step(rl_instructions, paths, current_location, current_instruction)
         current_instruction = (current_instruction + 1) % len(rl_instructions)
-        path_length += 1
-    return path_length
+        i += 1
+    return i
 
+def find_all_loop_lenghts(rl_instructions, paths, start_locations):
+    return [find_loop_lenght(rl_instructions, paths, l) for l in start_locations]
+
+def get_simultaneous_paths_length(rl_instructions, paths):
+    current_locations = [l for l in paths.keys() if l[-1] == 'A']
+    return math.lcm(*find_all_loop_lenghts(rl_instructions, paths, current_locations))
 
 assert get_simultaneous_paths_length(*example3) == 6
 result2 = get_simultaneous_paths_length(rl_instructions, paths)
