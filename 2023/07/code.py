@@ -2,6 +2,8 @@
 # https://adventofcode.com/2023/day/7
 # Author: Alexandre MALFREYT
 
+import time
+
 from functools import cmp_to_key
 import itertools
 
@@ -81,11 +83,13 @@ def compare_hands(hand1: List[str], hand2: List[str], f = hand_type) -> int:
         return 0
 
     # First we compare the hand types
-    if f(hand1) < f(hand2):
-        print(f'{hand1} ({f(hand1)}) < {hand2} ({f(hand2)})') if DEBUG else None
+    f1 = f(hand1)
+    f2 = f(hand2)
+    if f1 < f2:
+        print(f'{hand1} ({f1}) < {hand2} ({f2})') if DEBUG else None
         return -1
-    elif f(hand1) > f(hand2):
-        print(f'{hand1} ({f(hand1)}) > {hand2} ({f(hand2)})') if DEBUG else None
+    elif f1 > f2:
+        print(f'{hand1} ({f1}) > {hand2} ({f2})') if DEBUG else None
         return 1
     
     #If the hand types are the same, we compare the cards one by one
@@ -118,6 +122,8 @@ for i in range(len(games_sorted)):
 print(f'Part 1: {total}')
 
 
+# --------------------------------------------------------------------------------------------------------------
+
 
 # Part 2
 possible_cards = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
@@ -136,6 +142,7 @@ def hand_type_with_joker(hand: List[str]) -> int:
 
     return max_type
 
+start = time.time()
 assert hand_type_with_joker(['J', 'J', 'J', 'J', 'J']) == 7
 assert hand_type_with_joker(['J', 'J', 'J', 'J', 'K']) == 7
 assert hand_type_with_joker(['3', '2', 'T', '3', 'K']) == 2
@@ -143,17 +150,25 @@ assert hand_type_with_joker(['K', 'K', '6', '7', '7']) == 3
 assert hand_type_with_joker(['T', '5', '5', 'J', '5']) == 6
 assert hand_type_with_joker(['K', 'T', 'J', 'J', 'T']) == 6 
 assert hand_type_with_joker(['Q', 'Q', 'Q', 'J', 'A']) == 6
+end = time.time()
+print(f'Time (hand_type_with_joker assertions): {end - start} seconds')
 
 # 32T3K is still the only one pair; it doesn't contain any jokers, so its strength doesn't increase.
 # KK677 is now the only two pair, making it the second-weakest hand.
 # T55J5, KTJJT, and QQQJA are now all four of a kind! T55J5 gets rank 3, QQQJA gets rank 4, and KTJJT gets rank 5.
+start = time.time()
 assert compare_hands(['3', '2', 'T', '3', 'K'], ['K', 'K', '6', '7', '7'], hand_type_with_joker) == -1
 assert compare_hands(['K', 'K', '6', '7', '7'], ['K', 'T', 'J', 'J', 'T'], hand_type_with_joker) == -1
 assert compare_hands(['T', '5', '5', 'J', '5'], ['Q', 'Q', 'Q', 'J', 'A'], hand_type_with_joker) == -1
 assert compare_hands(['T', '5', '5', 'J', '5'], ['T', '5', '5', 'J', '5'], hand_type_with_joker) == 0
 assert compare_hands(['T', '5', '5', 'J', '5'], ['T', '5', '5', 'J', '6'], hand_type_with_joker) == 1
+end = time.time()
+print(f'Time (compare_hands with joker assertions): {end - start} seconds')
 
+start = time.time()
 games_sorted = sorted(games, key=cmp_to_key(lambda x, y: compare_hands(x['hand'], y['hand'], hand_type_with_joker)))
+end = time.time()
+print(f'Time (sorting with joker): {end - start} seconds')
 
 print([''.join(game['hand']) for game in games_sorted]) if DEBUG else None
 print([hand_type_with_joker(game['hand']) for game in games_sorted]) if DEBUG else None
