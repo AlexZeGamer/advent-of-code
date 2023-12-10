@@ -21,6 +21,7 @@ example1 = [['-','L','|','F','7'], ['7','S','-','7','|'], ['L','|','7','|','|'],
 example2 = [['7','-','F','7','-'], ['.','F','J','|','7'], ['S','J','L','L','7'], ['|','F','-','-','J'], ['L','J','.','L','J']]
 
 def visu_color(maze: List[List[str]], path: List[Tuple[int, int]]) -> None:
+    """Visualize the maze with the path with a color gradient and a dark gray background"""
     colors = ['\033[34m', '\033[94m', '\033[36m', '\033[96m', '\033[32m', '\033[92m', '\033[93m', '\033[33m', '\033[91m', '\033[31m', '\033[35m', '\033[95m']
 
     for i, line in enumerate(maze):
@@ -32,6 +33,7 @@ def visu_color(maze: List[List[str]], path: List[Tuple[int, int]]) -> None:
         print()
 
 def visu_green(maze: List[List[str]], path: List[Tuple[int, int]]) -> None:
+    """Visualize the maze with the path in green and a dark gray background"""
     for i, line in enumerate(maze):
         for j, c in enumerate(line):
             color = '\033[92m' if (i,j) in path else '\033[90m'
@@ -40,19 +42,23 @@ def visu_green(maze: List[List[str]], path: List[Tuple[int, int]]) -> None:
             print('\033[0m', end='')
         print()
 
-def visu_BandW(maze: List[List[str]], path: List[Tuple[int, int]]) -> None:
-    for i, line in enumerate(maze):
-        for j, c in enumerate(line):
+def visu_BandW(maze: List[List[str]]) -> None:
+    """Visualize the maze in black and white"""
+    for line in maze:
+        for c in line:
             print(repr[c], end='')
         print()
 
 def find_start(maze: List[List[str]]) -> Tuple[int, int]:
+    """Find the start position in the maze"""
     for i, line in enumerate(maze):
         for j, c in enumerate(line):
             if c == 'S':
                 return (i,j)
     
 def is_connected(maze: List[List[str]], pos1: Tuple[int, int], pos2: Tuple[int, int]) -> bool:
+    """Check if two positions of the maze are connected with a pipe"""
+
     # Same line (x)
     if pos1[0] == pos2[0]:
         possible_left = ['-', 'L', 'F', 'S']
@@ -78,6 +84,8 @@ def is_connected(maze: List[List[str]], pos1: Tuple[int, int], pos2: Tuple[int, 
 
 
 def next_pos(maze: List[List[str]], pos: Tuple[int, int], prev: Tuple[int, int]) -> Tuple[int, int]:
+    """Find the next position in the maze from the current position (avoid going back)"""
+
     x, y = pos
     for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
         # Same as previous
@@ -92,10 +100,15 @@ def next_pos(maze: List[List[str]], pos: Tuple[int, int], prev: Tuple[int, int])
             return (x+dx, y+dy)
 
 def get_path(maze: List[List[str]]) -> List[Tuple[int, int]]:
+    """Find the path in the maze (loop from start to start)"""
+    visu_BandW(maze) if DEBUG else None
+
+    # Find start position and initialize path
     start = find_start(maze)
     pos = start
     path = [start]
-    visu_BandW(maze) if DEBUG else None
+
+    # Loop until we find the start position again
     while pos != start or len(path) <= 1:
         prev = path[-2] if len(path) > 1 else None
         pos = next_pos(maze, pos, prev)
@@ -104,6 +117,7 @@ def get_path(maze: List[List[str]]) -> List[Tuple[int, int]]:
         sleep(0.2) if DEBUG else None
 
         path.append(pos)
+
     visu_color(maze, path) if VISU else None
     return path
 
