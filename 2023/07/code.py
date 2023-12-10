@@ -3,6 +3,8 @@
 # Author: Alexandre MALFREYT
 
 from functools import cmp_to_key
+import itertools
+
 from typing import List, Dict
 
 DEBUG = False
@@ -66,7 +68,7 @@ def hand_type(hand: List[str]) -> int:
     else:
         return 1
     
-def compare_hands(hand1: List[str], hand2: List[str]) -> int:
+def compare_hands(hand1: List[str], hand2: List[str], f = hand_type) -> int:
     print(f'Comparing {hand1} and {hand2}') if DEBUG else None
 
     if type(hand1) != list or type(hand2) != list:
@@ -79,11 +81,11 @@ def compare_hands(hand1: List[str], hand2: List[str]) -> int:
         return 0
 
     # First we compare the hand types
-    if hand_type(hand1) < hand_type(hand2):
-        print(f'{hand1} ({hand_type(hand1)}) < {hand2} ({hand_type(hand2)})') if DEBUG else None
+    if f(hand1) < f(hand2):
+        print(f'{hand1} ({f(hand1)}) < {hand2} ({f(hand2)})') if DEBUG else None
         return -1
-    elif hand_type(hand1) > hand_type(hand2):
-        print(f'{hand1} ({hand_type(hand1)}) > {hand2} ({hand_type(hand2)})') if DEBUG else None
+    elif f(hand1) > f(hand2):
+        print(f'{hand1} ({f(hand1)}) > {hand2} ({f(hand2)})') if DEBUG else None
         return 1
     
     #If the hand types are the same, we compare the cards one by one
@@ -95,10 +97,7 @@ def compare_hands(hand1: List[str], hand2: List[str]) -> int:
             elif possible_cards.index(hand1[i]) > possible_cards.index(hand2[i]):
                 print(f'{hand1} > {hand2} because {hand1[i]} > {hand2[i]}') if DEBUG else None
                 return 1
-
-# 32T3K is the only one pair and the other hands are all a stronger type, so it gets rank 1.
-# KK677 and KTJJT are both two pair. Their first cards both have the same label, but the second card of KK677 is stronger (K vs T), so KTJJT gets rank 2 and KK677 gets rank 3.
-# T55J5 and QQQJA are both three of a kind. QQQJA has a stronger first card, so it gets rank 5 and T55J5 gets rank 4.
+    return None
 
 assert compare_hands(['3', '2', 'T', '3', 'K'], ['K', 'K', '6', '7', '7']) == -1
 assert compare_hands(['K', 'K', '6', '7', '7'], ['K', 'T', 'J', 'J', 'T']) == 1
@@ -107,8 +106,6 @@ assert compare_hands(['T', '5', '5', 'J', '5'], ['T', '5', '5', 'J', '5']) == 0
 assert compare_hands(['T', '5', '5', 'J', '5'], ['T', '5', '5', 'J', '6']) == 1
 
 # sort from lowest to highest power (compare_hands)
-# games.sort(key=cmp_to_key(lambda x, y: compare_hands(x['hand'], y['hand'])))
-
 games_sorted = sorted(games, key=cmp_to_key(lambda x, y: compare_hands(x['hand'], y['hand'])))
 
 print([''.join(game['hand']) for game in games]) if DEBUG else None
@@ -120,7 +117,49 @@ for i in range(len(games_sorted)):
 
 print(f'Part 1: {total}')
 
+
+
 # Part 2
+possible_cards = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
+possible_cards.reverse() # from lowest to highest
+
+def hand_type_with_joker(hand: List[str]) -> int:
+    hand = hand.copy()
+    joker_indexes = [i for i, card in enumerate(hand) if card == 'J']
+    max_type = 0
+
+    it = itertools.product(possible_cards, repeat=len(joker_indexes))
+    for cards in it:
+        for i, card in enumerate(cards):
+            hand[joker_indexes[i]] = card
+        max_type = max(max_type, hand_type(hand))
+
+    return max_type
+
+assert hand_type_with_joker(['J', 'J', 'J', 'J', 'J']) == 7
+assert hand_type_with_joker(['J', 'J', 'J', 'J', 'K']) == 7
+assert hand_type_with_joker(['3', '2', 'T', '3', 'K']) == 2
+assert hand_type_with_joker(['K', 'K', '6', '7', '7']) == 3
+assert hand_type_with_joker(['T', '5', '5', 'J', '5']) == 6
+assert hand_type_with_joker(['K', 'T', 'J', 'J', 'T']) == 6 
+assert hand_type_with_joker(['Q', 'Q', 'Q', 'J', 'A']) == 6
+
+# 32T3K is still the only one pair; it doesn't contain any jokers, so its strength doesn't increase.
+# KK677 is now the only two pair, making it the second-weakest hand.
+# T55J5, KTJJT, and QQQJA are now all four of a kind! T55J5 gets rank 3, QQQJA gets rank 4, and KTJJT gets rank 5.
+assert compare_hands(['3', '2', 'T', '3', 'K'], ['K', 'K', '6', '7', '7'], hand_type_with_joker) == -1
+assert compare_hands(['K', 'K', '6', '7', '7'], ['K', 'T', 'J', 'J', 'T'], hand_type_with_joker) == -1
+assert compare_hands(['T', '5', '5', 'J', '5'], ['Q', 'Q', 'Q', 'J', 'A'], hand_type_with_joker) == -1
+assert compare_hands(['T', '5', '5', 'J', '5'], ['T', '5', '5', 'J', '5'], hand_type_with_joker) == 0
+assert compare_hands(['T', '5', '5', 'J', '5'], ['T', '5', '5', 'J', '6'], hand_type_with_joker) == 1
+
+games_sorted = sorted(games, key=cmp_to_key(lambda x, y: compare_hands(x['hand'], y['hand'], hand_type_with_joker)))
+
+print([''.join(game['hand']) for game in games_sorted]) if DEBUG else None
+print([hand_type_with_joker(game['hand']) for game in games_sorted]) if DEBUG else None
+
 total = 0
+for i in range(len(games_sorted)):
+    total += games_sorted[i]['bid'] * (i + 1)
 
 print(f'Part 2: {total}')
