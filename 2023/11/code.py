@@ -26,7 +26,7 @@ image = [list(line) for line in lines]
 # ]
 
 # Part 1
-def expend_universe(universe: List[List[str]]) -> List[List[str]]:
+def expend_universe(universe: List[List[str]], expention: int = 2) -> List[List[str]]:
     """Expend the universe by duplicating the empty lines and columns"""
     universe = [line.copy() for line in universe]
 
@@ -34,9 +34,10 @@ def expend_universe(universe: List[List[str]]) -> List[List[str]]:
     i = 0
     while i < len(universe):
         if all([c == '.' for c in universe[i]]):
-            # If the line is empty, insert a line of empty space
-            universe.insert(i, ['.'] * len(universe[i]))
-            i += 1
+            # If the line is empty, duplicate it "expention" times
+            for _ in range(expention-1):
+                universe.insert(i, ['.'] * len(universe[i]))
+            i += expention-1
         i += 1
 
     # Horizontally
@@ -48,11 +49,12 @@ def expend_universe(universe: List[List[str]]) -> List[List[str]]:
                 is_empty = False
                 break
 
-        # If the column is empty, insert a column of empty space
+        # If the column is empty, duplicate it "expention" times
         if is_empty:
-            for line in universe:
-                line.insert(i, '.')
-            i += 1
+            for _ in range(expention-1):
+                for line in universe:
+                    line.insert(i, '.')
+            i += expention-1
         i += 1
 
     return universe
@@ -143,6 +145,16 @@ print(f'Part 1 : {total}')
 
 
 # Part 2
+universe = expend_universe(image, 1_000_000)
+stars = get_stars_location(universe)
+
 total = 0
+for i in range(len(stars)):
+    for j in range(i + 1, len(stars)):
+        total += distance(stars[i], stars[j])
+        if DEBUG:
+            print(f'{stars[i]} -> {stars[j]} : {distance(stars[i], stars[j])}')
+            p = path(stars[i], stars[j])
+            print_universe(universe, p, True)
 
 print(f'Part 2 : {total}')

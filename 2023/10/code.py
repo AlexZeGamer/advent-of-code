@@ -20,7 +20,8 @@ if __name__ == '__main__':
 
     # Replace start with the correct pipe
     start = find_start(maze)
-    maze[start[0]][start[1]] = predict_pipe(maze, start)
+    predicted_start_pipe = predict_pipe(maze, start)
+    maze[start[0]][start[1]] = predicted_start_pipe
 
     # Part 1
     path = get_path(maze, start)
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     start = time.time()
 
     visu_color(maze, path, True) if VISU else None
-    
+
     end = time.time()
     print(f'Visualisation time: {end-start} s')
     

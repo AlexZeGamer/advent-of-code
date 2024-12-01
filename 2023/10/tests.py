@@ -1,4 +1,4 @@
-from code import *
+from code import find_start, get_path, predict_pipe, get_farthest_point_distance, get_number_of_tiles_in_loop
 
 # Examples
 example1 = [
@@ -72,9 +72,12 @@ example6 = [
 start_poses = []
 paths = []
 for e in [example1, example2, example3, example4, example5, example6]:
+    # Replace start with the correct pipe
     start_pos = find_start(e)
     start_poses.append(start_pos)
+    e[start_pos[0]][start_pos[1]] = predict_pipe(e, start_pos)
 
+    # Get path
     path = get_path(e, start_pos)
     paths.append(path)
 

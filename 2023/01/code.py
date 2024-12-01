@@ -67,6 +67,7 @@ assert check_if_word_at_pos("onetwothree", 1, "one") == False
 assert check_if_word_at_pos("onetwothree", 0, "four") == False
 
 total = 0
+res_by_line = []
 
 for line in lines:
     first = None
@@ -84,6 +85,10 @@ for line in lines:
                         first = digit
                     last = digit
 
+    res_by_line.append(first+last)
     total += int(first+last)
 
 print(f'Part 2 : {total}')
+
+with open('output.txt', 'w') as f:
+    f.write('\n'.join(res_by_line))

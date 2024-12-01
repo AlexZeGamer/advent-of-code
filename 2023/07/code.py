@@ -129,16 +129,50 @@ print(f'Part 1: {total}')
 possible_cards = ['A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J']
 possible_cards.reverse() # from lowest to highest
 
-def hand_type_with_joker(hand: List[str]) -> int:
-    hand = hand.copy()
-    joker_indexes = [i for i, card in enumerate(hand) if card == 'J']
-    max_type = 0
+# def hand_type_with_joker(hand: List[str]) -> int:
+#     hand = hand.copy()
+#     joker_indexes = [i for i, card in enumerate(hand) if card == 'J']
+#     max_type = 0
 
-    it = itertools.product(possible_cards, repeat=len(joker_indexes))
-    for cards in it:
-        for i, card in enumerate(cards):
-            hand[joker_indexes[i]] = card
-        max_type = max(max_type, hand_type(hand))
+#     it = itertools.product(possible_cards, repeat=len(joker_indexes))
+#     for cards in it:
+#         for i, card in enumerate(cards):
+#             hand[joker_indexes[i]] = card
+#         max_type = max(max_type, hand_type(hand))
+
+#     return max_type
+
+# Optimized by ChatGPT
+def hand_type_with_joker(hand: List[str]) -> int:
+    joker_count = hand.count('J')
+    if joker_count == 5:
+        return 7  # Immediately return the highest rank for 5 jokers
+
+    rep = repartition([card for card in hand if card != 'J'])
+    cards_frequency = list(rep.values())
+
+    # Find the max frequency of a card (excluding jokers)
+    max_freq = max(cards_frequency, default=0)
+
+    # If max frequency + jokers >= 5, it's a 'Five of a kind'
+    if max_freq + joker_count >= 5:
+        return 7
+
+    max_type = hand_type(hand)
+
+    for cards in itertools.combinations_with_replacement(possible_cards, joker_count):
+        new_hand = hand.copy()
+        joker_replacement_index = 0
+        for i, card in enumerate(new_hand):
+            if card == 'J':
+                new_hand[i] = cards[joker_replacement_index]
+                joker_replacement_index += 1
+        new_type = hand_type(new_hand)
+        max_type = max(max_type, new_type)
+
+        # Early exit if the highest rank is achieved
+        if max_type == 7:
+            break
 
     return max_type
 
@@ -151,7 +185,7 @@ assert hand_type_with_joker(['T', '5', '5', 'J', '5']) == 6
 assert hand_type_with_joker(['K', 'T', 'J', 'J', 'T']) == 6 
 assert hand_type_with_joker(['Q', 'Q', 'Q', 'J', 'A']) == 6
 end = time.time()
-print(f'Time (hand_type_with_joker assertions): {end - start} seconds')
+print(f'Time (hand_type_with_joker assertions): {end - start} seconds') if DEBUG else None
 
 # 32T3K is still the only one pair; it doesn't contain any jokers, so its strength doesn't increase.
 # KK677 is now the only two pair, making it the second-weakest hand.
@@ -163,12 +197,12 @@ assert compare_hands(['T', '5', '5', 'J', '5'], ['Q', 'Q', 'Q', 'J', 'A'], hand_
 assert compare_hands(['T', '5', '5', 'J', '5'], ['T', '5', '5', 'J', '5'], hand_type_with_joker) == 0
 assert compare_hands(['T', '5', '5', 'J', '5'], ['T', '5', '5', 'J', '6'], hand_type_with_joker) == 1
 end = time.time()
-print(f'Time (compare_hands with joker assertions): {end - start} seconds')
+print(f'Time (compare_hands with joker assertions): {end - start} seconds') if DEBUG else None
 
 start = time.time()
 games_sorted = sorted(games, key=cmp_to_key(lambda x, y: compare_hands(x['hand'], y['hand'], hand_type_with_joker)))
 end = time.time()
-print(f'Time (sorting with joker): {end - start} seconds')
+print(f'Time (sorting with joker): {end - start} seconds') if DEBUG else None
 
 print([''.join(game['hand']) for game in games_sorted]) if DEBUG else None
 print([hand_type_with_joker(game['hand']) for game in games_sorted]) if DEBUG else None

@@ -40,7 +40,6 @@ total = 0
 
 time = int(''.join([str(val) for val in times]))
 distance = int(''.join([str(val) for val in distances]))
-print(time, distance)
 
 number_of_ways_to_win = 0
 for time_pressing_button in range(time):

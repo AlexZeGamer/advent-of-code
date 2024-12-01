@@ -22,39 +22,53 @@ def find_start(maze: List[List[str]]) -> Tuple[int, int]:
 def predict_pipe(maze: List[List[str]], pos: Tuple[int, int]) -> str:
     """Predict the pipe at a given position in the maze"""
     directions = {'up': (pos[0]-1, pos[1]), 'down': (pos[0]+1, pos[1]), 'left': (pos[0], pos[1]-1), 'right': (pos[0], pos[1]+1)}
-    for pipe, dirs in possible_pipes.items():
-        if all([is_connected(maze, pos, directions[d]) for d in dirs]):
-            return pipe
-        
-    return None
 
+    # Check every possible pipe and return the first one that fits
+    for pipe in possible_pipes:
+        pipe_fits = True
+
+        # Check if the current pipe fits with the pipes around it
+        for i, dir in enumerate(possible_pipes[pipe]):
+            fits = False
+            if dir == 'up' and directions['up'][0] >= 0:
+                fits = are_pipes_connectable_vertical(maze[directions['up'][0]][directions['up'][1]], pipe) or fits
+            if dir == 'down' and directions['down'][0] < len(maze):
+                fits = are_pipes_connectable_vertical(pipe, maze[directions['down'][0]][directions['down'][1]]) or fits
+            if dir == 'left' and directions['left'][1] >= 0:
+                fits = are_pipes_connectable_horizontal(maze[directions['left'][0]][directions['left'][1]], pipe) or fits
+            if dir == 'right' and directions['right'][1] < len(maze[0]):
+                fits = are_pipes_connectable_horizontal(pipe, maze[directions['right'][0]][directions['right'][1]]) or fits
+            pipe_fits = fits and pipe_fits
+
+        # Return the first pipe that fits
+        if pipe_fits:
+            return pipe
+
+
+def are_pipes_connectable_vertical(up: str, down: str) -> bool:
+    """Check if two pipes are connectable vertically"""
+    possible_up = [p for p in possible_pipes if 'down' in possible_pipes[p]]
+    possible_down = [p for p in possible_pipes if 'up' in possible_pipes[p]]
+    return up in possible_up and down in possible_down
+
+def are_pipes_connectable_horizontal(left: str, right: str) -> bool:
+    """Check if two pipes are connectable horizontally"""
+    possible_left = [p for p in possible_pipes if 'right' in possible_pipes[p]]
+    possible_right = [p for p in possible_pipes if 'left' in possible_pipes[p]]
+    return left in possible_left and right in possible_right
     
 def is_connected(maze: List[List[str]], pos1: Tuple[int, int], pos2: Tuple[int, int]) -> bool:
     """Check if two positions of the maze are connected with a pipe"""
 
     # Same line (x)
     if pos1[0] == pos2[0]:
-        possible_left = [p for p in possible_pipes if 'right' in possible_pipes[p]]
-        possible_right = [p for p in possible_pipes if 'left' in possible_pipes[p]]
-        possible_left = ['-', 'L', 'F', 'S']
-        possible_right = ['-', 'J', '7', 'S']
-
-
-        left, right = sorted([pos1, pos2], key=lambda pos: pos[1])
-        
-        return maze[left[0]][left[1]] in possible_left and maze[right[0]][right[1]] in possible_right
+        left_pos, right_pos = sorted([pos1, pos2], key=lambda pos: pos[1])
+        return are_pipes_connectable_horizontal(maze[left_pos[0]][left_pos[1]], maze[right_pos[0]][right_pos[1]])
 
     # Same column (y)
     if pos1[1] == pos2[1]:
-        possible_up = [p for p in possible_pipes if 'down' in possible_pipes[p]]
-        possible_down = [p for p in possible_pipes if 'up' in possible_pipes[p]]
-        possible_up = ['|', 'F', '7', 'S']
-        possible_down = ['|', 'J', 'L', 'S']
-
-
-        up, down = sorted([pos1, pos2], key=lambda pos: pos[0])
-        
-        return maze[up[0]][up[1]] in possible_up and maze[down[0]][down[1]] in possible_down
+        up_pos, down_pos = sorted([pos1, pos2], key=lambda pos: pos[0])
+        return are_pipes_connectable_vertical(maze[up_pos[0]][up_pos[1]], maze[down_pos[0]][down_pos[1]])
     
     # Not connected
     return False
