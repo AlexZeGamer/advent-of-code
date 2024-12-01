@@ -29,5 +29,7 @@ print(f'Part 1 : {total}')
 # Part 2
 total = 0
 
+for left in left_list:
+    total += left * right_list.count(left)
 
 print(f'Part 2 : {total}')
