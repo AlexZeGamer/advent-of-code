@@ -31,11 +31,19 @@ if not os.path.exists(f'{year_directory}/{day_directory}/input.txt'):
     if r.ok:
         with open(f"{year_directory}/{day_directory}/input.txt", "wb") as f:
             f.write(r.content)
+        print('\033[92m', end='') # Green
         print(f'Downloaded input file for {year}/{day}')
+        print('\033[0m', end='')
     else:
-        print(f'Error getting input for day {day} of year {year}')
+        print('\033[91m', end='') # Red
+        print(f'Error getting input for day {day} of year {year} (Status code: {r.status_code})')
+        print(f'Message: "{r.text.strip()}"')
+        print('(Maybe update the cookie in the .env file?)')
+        print('\033[0m', end='')
 else:
-    print(f"File {year_directory}/{day_directory}/input.txt already exists")
+    print('\033[93m', end='') # Yellow
+    print(f"File {year_directory}/{day_directory}/input.txt already exists, ignoring...")
+    print('\033[0m', end='')
 
 
 # Create python template
@@ -59,6 +67,10 @@ if not os.path.exists(f"{year_directory}/{day_directory}/code.py"):
             f"\n\n\n"
             f"print(f'Part 2 : {{total}}')\n"
         )
+    print('\033[92m', end='') # Green
     print(f"Created template for {year}/{day}")
+    print('\033[0m', end='')
 else:
-    print(f"File {year_directory}/{day_directory}/code.py already exists")
+    print('\033[93m', end='') # Yellow
+    print(f"File {year_directory}/{day_directory}/code.py already exists, ignoring...")
+    print('\033[0m', end='')
