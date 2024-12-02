@@ -37,5 +37,25 @@ print(f'Part 1 : {total}')
 # Part 2
 total = 0
 
+def is_safe_with_problem_dampener(report: list):
+    if is_safe(report):
+        return True
+    
+    # If not safe, there is a tolerance of 1 element to remove
+    print(f'\n{report}')
+    for i in range(len(report)):
+        print(f'removing {report[i]}', end=' -> ')
+        _report = report.copy()
+        _report.remove(report[i])
+        print(_report, end=' -> ')
+        if is_safe(_report):
+            print(f'safe (if removing {report[i]})')
+            return True
+        print('unsafe')
+    return False    
+        
+for report in reports:
+    if is_safe_with_problem_dampener(report):
+        total += 1
 
 print(f'Part 2 : {total}')
