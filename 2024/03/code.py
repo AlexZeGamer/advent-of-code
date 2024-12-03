@@ -36,10 +36,10 @@ last_pos = -1
 for mul_match in mul_matches:
     pos = mul_match[0]
     a, b = mul_match[1:]
-    
+
     skip = False
 
-    # filter all dont matches between the last mul that was not skipped and current match
+    # if there is a dont() between the last mul that was not skipped and current match, skip the current match
     last_dont_pos = -1
     for dont_pos in dont_matches:
         if last_pos < dont_pos < pos:
@@ -47,7 +47,7 @@ for mul_match in mul_matches:
             skip = True
             break
     
-    # filter all do matches between the last dont in the range and current match
+    # but if there is a do() between the last dont in the range and current match, cancel the skip
     for do_pos in do_matches:
         if last_dont_pos < do_pos < pos:
             skip = False
