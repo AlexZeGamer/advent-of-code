@@ -23,7 +23,7 @@ print(f'Part 1 : {total}')
 # Part 2
 total = 0
 
-text = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
+# text = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
 
 do_regex = re.compile(r'do\(\)')
 dont_regex = re.compile(r"don't\(\)")
@@ -32,10 +32,29 @@ do_matches = [match.start() for match in do_regex.finditer(text)] # [(pos1), (po
 dont_matches = [match.start() for match in dont_regex.finditer(text)] # [(pos1), (pos2), ...]
 mul_matches = [(match.start(), *map(int, match.groups())) for match in mul_regex.finditer(text)] # [(pos1, a1, b1), (pos2, a2, b2), ...]
 
+last_pos = -1
 for mul_match in mul_matches:
-    if any(do_match < mul_match[0] < dont_match for do_match in do_matches for dont_match in dont_matches):
-        continue
+    pos = mul_match[0]
     a, b = mul_match[1:]
-    total += a * b
+    
+    skip = False
+
+    # filter all dont matches between the last mul that was not skipped and current match
+    last_dont_pos = -1
+    for dont_pos in dont_matches:
+        if last_pos < dont_pos < pos:
+            last_dont_pos = dont_pos
+            skip = True
+            break
+    
+    # filter all do matches between the last dont in the range and current match
+    for do_pos in do_matches:
+        if last_dont_pos < do_pos < pos:
+            skip = False
+            break
+    
+    if not skip:
+        last_pos = pos
+        total += a * b
 
 print(f'Part 2 : {total}')
