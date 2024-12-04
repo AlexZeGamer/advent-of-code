@@ -73,5 +73,34 @@ print(f'Part 1 : {total}')
 # Part 2
 total = 0
 
+a_pos_list = [(x, y) for y, row in enumerate(grid) for x, letter in enumerate(row) if letter == 'A']
+for x, y in a_pos_list:
+    # check if the A is on the border (which would make it impossible to have a pattern)
+    if x == 0 or x == len(grid) - 1 or y == 0 or y == len(grid) - 1:
+        continue
+
+    # M M
+    #  A 
+    # S S
+    if grid[y - 1][x - 1] == 'M' and grid[y - 1][x + 1] == 'M' and grid[y + 1][x - 1] == 'S' and grid[y + 1][x + 1] == 'S':
+        total += 1
+
+    # S S
+    #  A
+    # M M
+    if grid[y - 1][x - 1] == 'S' and grid[y - 1][x + 1] == 'S' and grid[y + 1][x - 1] == 'M' and grid[y + 1][x + 1] == 'M':
+        total += 1
+
+    # M S
+    #  A 
+    # M S
+    if grid[y - 1][x - 1] == 'M' and grid[y - 1][x + 1] == 'S' and grid[y + 1][x - 1] == 'M' and grid[y + 1][x + 1] == 'S':
+        total += 1
+
+    # S M
+    #  A
+    # S M
+    if grid[y - 1][x - 1] == 'S' and grid[y - 1][x + 1] == 'M' and grid[y + 1][x - 1] == 'S' and grid[y + 1][x + 1] == 'M':
+        total += 1
 
 print(f'Part 2 : {total}')
