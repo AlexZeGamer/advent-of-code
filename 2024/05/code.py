@@ -49,21 +49,21 @@ updates = [list(map(int, line.split(','))) for line in updates]
 # ]
 
 # Part 1
-valid_updates = []
-for update in updates:
-    valid = True
-
+def check_update(update, rules):
     for rule in rules:
         if not all(x in update for x in rule):
             continue
-
-        # if not (all(update.index(rule[i]) < update.index(rule[i + 1]) for i in range(len(rule) - 1))):
         if not (update.index(rule[0]) < update.index(rule[1])):
-            valid = False
-            break
-    
-    if valid:
+            return False
+    return True
+
+valid_updates = []
+invalid_updates = []
+for update in updates:
+    if check_update(update, rules):
         valid_updates.append(update)
+    else:
+        invalid_updates.append(update)
 
 total = 0
 for update in valid_updates:
@@ -75,5 +75,15 @@ print(f'Part 1 : {total}')
 # Part 2
 total = 0
 
+for update in invalid_updates:
+    while not check_update(update, rules):
+        for rule in rules:
+            if not all(x in update for x in rule):
+                continue
+            if not (update.index(rule[0]) < update.index(rule[1])):
+                index1 = update.index(rule[0])
+                index2 = update.index(rule[1])
+                update[index1], update[index2] = update[index2], update[index1]
+    total += update[len(update)//2]
 
 print(f'Part 2 : {total}')
