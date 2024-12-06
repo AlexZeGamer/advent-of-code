@@ -31,6 +31,7 @@ def get_current_position_and_direction(grid):
                 return (x, y), 'SOUTH'
             elif letter == '<':
                 return (x, y), 'WEST'
+    raise ValueError('No starting position found')
 
 def move_forward(position, direction):
     x, y = position
@@ -53,42 +54,78 @@ def turn_right(direction):
     elif direction == 'WEST':
         return 'NORTH'
 
-def get_symbol_for_direction(direction):
-    if direction == 'NORTH':
-        return '^'
-    elif direction == 'EAST':
-        return '>'
-    elif direction == 'SOUTH':
-        return 'v'
-    elif direction == 'WEST':
-        return '<'
+def print_grid(grid):
+    print('\n'.join([''.join(x) for x in grid]))
+    print()
 
-total = 1
-visited = set()
-(x, y), direction = get_current_position_and_direction(grid)
-while True:
-    new_x, new_y = move_forward((x, y), direction)
-    try:
-        if grid[new_y][new_x] == '#':
+def get_path(_grid, do_print_grid=False):
+    grid = [line.copy() for line in _grid]
+
+    visited = []
+    (x, y), direction = get_current_position_and_direction(grid)
+
+    while True:
+        if not len(visited) or visited[-1] != (x, y):
+            grid[y][x] = 'X'
+            visited.append((x, y))
+
+        new_x, new_y = move_forward((x, y), direction)
+        if new_x < 0 or new_x >= len(grid[0]) or new_y < 0 or new_y >= len(grid):
+            break
+
+        if grid[new_y][new_x] in ['#', 'O']:
             direction = turn_right(direction)
         else:
-            grid[y][x] = 'X'
-            visited.add((x, y))
-            if not (new_x, new_y) in visited:
-                total += 1
-
-            grid[new_y][new_x] = get_symbol_for_direction(direction)
+            # If (x, y) and (new_x, new_y) are in visited next to each other in the same order, we have a loop
+            # for i in range(len(visited) - 1):
+            #     if visited[i] == (x, y) and visited[i + 1] == (new_x, new_y):
+            #         grid[y][x] = 'L'
+            #         raise ValueError('Loop detected')
+            if len(visited) >= 10000:
+                raise ValueError('Loop detected')
             x, y = new_x, new_y
-    except IndexError:
-        break
 
-# print('\n'.join([''.join(x) for x in grid]))
+    if do_print_grid:
+        print_grid(grid)
 
-print(f'Part 1 : {total}')
+    return set(visited)
+
+def get_path_length(grid):
+    visited = get_path(grid)
+    return len(set(visited))
+
+print(f'Part 1 : {get_path_length(grid)}')
 
 
 # Part 2
+possible_obstructions = []
 
+import itertools
+i = 0
+start_position, _ = get_current_position_and_direction(grid)
 
+# get every cell next to the path (max 1 cell away) or on the path
+path = get_path(grid)
+to_test = []
+for x, y in itertools.product(range(len(grid[0])), range(len(grid))):
+    if (x, y) in path or any(abs(x - x2) <= 1 and abs(y - y2) <= 1 for (x2, y2) in path):
+        to_test.append((x, y))
 
-print(f'Part 2 : {total}')
+# for x, y in itertools.product(range(len(grid[0])), range(len(grid))):
+for x, y in to_test:
+    i += 1
+    # print(f'{i}/{len(grid) * len(grid[0])}', end='\r')
+    print(f'{i}/{len(to_test)}', end='\r') if i % 100 == 0 else None
+    
+    if grid[y][x] == '#' or (x, y) == start_position:
+        continue
+
+    grid_with_obstacle = [line.copy() for line in grid]
+    grid_with_obstacle[y][x] = 'O'
+    try:
+        get_path_length(grid_with_obstacle)
+    except ValueError as e:
+        if 'Loop detected' in str(e):
+            possible_obstructions.append((x, y))
+
+print(f'Part 2 : {len(possible_obstructions)}')
