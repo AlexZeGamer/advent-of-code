@@ -62,6 +62,8 @@ def calculate(equation, operators):
                 sub_total *= operands[i+1]
             elif operator == '||':
                 sub_total = int(str(sub_total) + str(operands[i+1]))
+            else:
+                raise ValueError(f'Unknown operator: {operator}')
 
         # If the result is the same as the expected result, we add it to the total
         equation_str = ' '.join([str(n) + ' ' + comb[i] for i, n in enumerate(operands[:-1])]) + ' ' + str(operands[-1])
@@ -79,25 +81,18 @@ def calculate(equation, operators):
     
     return False
 
+def process_equations(equations, operators):
+    total = 0
+    for equation in equations:
+        expected_result = equation[0]
+        if calculate(equation, operators):
+            total += expected_result
+    return total
+
 # Part 1
-operators = ["+", "*"]
-
-
-total = 0
-for equation in equations:
-    expected_result = equation[0]
-    if calculate(equation, operators):
-        total += expected_result
-
-print(f'Part 1 : {total}')
+operators_part1 = ["+", "*"]
+print(f'Part 1 : {process_equations(equations, operators_part1)}')
 
 # Part 2
-operators = ['+', '*', '||']
-
-total = 0
-for equation in equations:
-    expected_result = equation[0]
-    if calculate(equation, operators):
-        total += expected_result
-
-print(f'Part 2 : {total}')
+operators_part2 = ['+', '*', '||']
+print(f'Part 2 : {process_equations(equations, operators_part2)}')
