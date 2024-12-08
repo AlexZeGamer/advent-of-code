@@ -27,47 +27,78 @@ equations = [
 #     ( 292,    [11, 6, 16, 20] ),
 # ]
 
-# Part 1
-DEBUG_PART1 = False
+DEBUG = False
 
-operatiors = ['+', '*']
+def calculate(equation, operators):
+    """
+    Returns if the equation can be calculated with the given operators to get the expected result or not
+
+    Args:
+        equation (tuple[int, list[int]]): The equation to calculate
+        operators (list): The list of operators to use to calculate the equation (possible values: '+', '*', '||')
+
+    Returns:
+        bool: True if the equation can be calculated with the given operators to get the expected result, False otherwise
+
+    Examples:
+        - calculate((190, [10, 19]), ['+', '*']) -> True
+        - calculate((83, [17, 5]), ['+', '*']) -> False
+    """
+    print(f'\nEquation: {equation}') if DEBUG else None
+
+    expected_result = equation[0]
+    operands = equation[1]
+
+    # We try all possible combinations of + and * operators
+    for comb in itertools.product(operators, repeat=len(operands)-1):
+        print(comb) if DEBUG else None
+        sub_total = operands[0]
+
+        # We calculate the result of the equation with the current combination of operators
+        for i, operator in enumerate(comb):
+            if operator == '+':
+                sub_total += operands[i+1]
+            elif operator == '*':
+                sub_total *= operands[i+1]
+            elif operator == '||':
+                # TODO
+                ...
+
+        # If the result is the same as the expected result, we add it to the total
+        equation_str = ' '.join([str(n) + ' ' + comb[i] for i, n in enumerate(operands[:-1])]) + ' ' + str(operands[-1])
+        if sub_total == expected_result:
+            if DEBUG:
+                print('\033[92m', end='')
+                print(f'{equation_str} = {expected_result}')
+                print('\033[0m', end='')
+            return True
+        else:
+            if DEBUG:
+                print('\033[91m', end='')
+                print(f'{equation_str} = {sub_total} != {expected_result}')
+                print('\033[0m', end='')
+    
+    return False
+
+# Part 1
+operators = ["+", "*"]
+
 
 total = 0
 for equation in equations:
-    print(f'Equation: {equation}') if DEBUG_PART1 else None
-    # We try all possible combinations of + and * operators
-    for comb in itertools.product(operatiors, repeat=len(equation[1])-1):
-        print(comb) if DEBUG_PART1 else None
-        sub_total = equation[1][0]
-
-        # We calculate the result of the equation
-        for i, operator in enumerate(comb):
-            if operator == '+':
-                sub_total += equation[1][i+1]
-            elif operator == '*':
-                sub_total *= equation[1][i+1]
-
-        # If the result is the same as the expected result, we add it to the total
-        equation_str = ' '.join([str(n) + ' ' + comb[i] for i, n in enumerate(equation[1][:-1])]) + ' ' + str(equation[1][-1])
-        if sub_total == equation[0]:
-            total += equation[0]
-            if DEBUG_PART1:
-                print('\033[92m', end='')
-                print(f'{equation_str} = {equation[0]}')
-                print('\033[0m', end='')
-            break
-        else:
-            if DEBUG_PART1:
-                print('\033[91m', end='')
-                print(f'{equation_str} = {sub_total} != {equation[0]}')
-                print('\033[0m', end='')
-    print() if DEBUG_PART1 else None
+    expected_result = equation[0]
+    if calculate(equation, operators):
+        total += expected_result
 
 print(f'Part 1 : {total}')
 
-
 # Part 2
-total = 0
+operators = ['+', '*', '||']
 
+total = 0
+# for equation in equations:
+#     expected_result = equation[0]
+#     if calculate(equation, operators):
+#         total += expected_result
 
 print(f'Part 2 : {total}')
