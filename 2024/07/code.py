@@ -52,17 +52,16 @@ def calculate(equation, operators):
     # We try all possible combinations of + and * operators
     for comb in itertools.product(operators, repeat=len(operands)-1):
         print(comb) if DEBUG else None
-        sub_total = operands[0]
 
         # We calculate the result of the equation with the current combination of operators
+        sub_total = operands[0]
         for i, operator in enumerate(comb):
             if operator == '+':
                 sub_total += operands[i+1]
             elif operator == '*':
                 sub_total *= operands[i+1]
             elif operator == '||':
-                # TODO
-                ...
+                sub_total = int(str(sub_total) + str(operands[i+1]))
 
         # If the result is the same as the expected result, we add it to the total
         equation_str = ' '.join([str(n) + ' ' + comb[i] for i, n in enumerate(operands[:-1])]) + ' ' + str(operands[-1])
@@ -96,9 +95,9 @@ print(f'Part 1 : {total}')
 operators = ['+', '*', '||']
 
 total = 0
-# for equation in equations:
-#     expected_result = equation[0]
-#     if calculate(equation, operators):
-#         total += expected_result
+for equation in equations:
+    expected_result = equation[0]
+    if calculate(equation, operators):
+        total += expected_result
 
 print(f'Part 2 : {total}')
