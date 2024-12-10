@@ -44,7 +44,7 @@ def get_score(map, trailhead, visited=None, check_visited=True):
             continue
 
         # Position already visited
-        if (new_x, new_y) in visited:
+        if (new_x, new_y) in visited and check_visited:
             continue
 
         visited.add((new_x, new_y)) if check_visited else None
