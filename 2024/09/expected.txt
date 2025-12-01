@@ -1,0 +1,42 @@
+0 * 0 = 0 (total = 0)
+1 * 0 = 0 (total = 0)
+2 * 9 = 18 (total = 18)
+3 * 9 = 27 (total = 45)
+4 * 2 = 8 (total = 53)
+5 * 1 = 5 (total = 58)
+6 * 1 = 6 (total = 64)
+7 * 1 = 7 (total = 71)
+8 * 7 = 56 (total = 127)
+9 * 7 = 63 (total = 190)
+10 * 7 = 70 (total = 260)
+Skip 11
+12 * 4 = 48 (total = 308)
+13 * 4 = 52 (total = 360)
+Skip 14
+15 * 3 = 45 (total = 405)
+16 * 3 = 48 (total = 453)
+17 * 3 = 51 (total = 504)
+Skip 18
+Skip 19
+Skip 20
+Skip 21
+22 * 5 = 110 (total = 614)
+23 * 5 = 115 (total = 729)
+24 * 5 = 120 (total = 849)
+25 * 5 = 125 (total = 974)
+Skip 26
+27 * 6 = 162 (total = 1136)
+28 * 6 = 168 (total = 1304)
+29 * 6 = 174 (total = 1478)
+30 * 6 = 180 (total = 1658)
+Skip 31
+Skip 32
+Skip 33
+Skip 34
+Skip 35
+36 * 8 = 288 (total = 1946)
+37 * 8 = 296 (total = 2242)
+38 * 8 = 304 (total = 2546)
+39 * 8 = 312 (total = 2858)
+Skip 40
+Skip 41
