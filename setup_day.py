@@ -6,6 +6,11 @@ import datetime
 
 load_dotenv()
 
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+RED = '\033[91m'
+RESET = '\033[0m'
+
 AOC_COOKIE = os.environ['AOC_COOKIE']   # Connection cookie from https://adventofcode.com/ ("session" cookie)
 AUTHOR = os.environ['AUTHOR']           # Author name
 
@@ -31,46 +36,24 @@ if not os.path.exists(f'{year_directory}/{day_directory}/input.txt'):
     if r.ok:
         with open(f"{year_directory}/{day_directory}/input.txt", "wb") as f:
             f.write(r.content)
-        print('\033[92m', end='') # Green
-        print(f'Downloaded input file for {year}/{day}')
-        print('\033[0m', end='')
+        print(f'{GREEN}Downloaded input file for {year}/{day}{RESET}')
     else:
-        print('\033[91m', end='') # Red
-        print(f'Error getting input for day {day} of year {year} (Status code: {r.status_code})')
-        print(f'Message: "{r.text.strip()}"')
-        print('(Maybe update the cookie in the .env file?)')
-        print('\033[0m', end='')
+        print(
+            f'{RED}' \
+            f'Error getting input for day {day} of year {year} (Status code: {r.status_code})\n' \
+            f'Message: "{r.text.strip()}"' \
+            f'(Maybe update the cookie in the .env file?)' \
+            f'{RESET}'
+        )
 else:
-    print('\033[93m', end='') # Yellow
-    print(f"File {year_directory}/{day_directory}/input.txt already exists, ignoring...")
-    print('\033[0m', end='')
-
+    print(f'{YELLOW}File {year_directory}/{day_directory}/input.txt already exists, ignoring...{RESET}')
 
 # Create python template
 if not os.path.exists(f"{year_directory}/{day_directory}/code.py"):
     with open(f"{year_directory}/{day_directory}/code.py", "w") as f:
-        f.write(
-            f"# Advent of Code {year} - Day {day}\n"
-            f"# https://adventofcode.com/{year}/day/{day}\n"
-            f"# Author: {AUTHOR}\n" 
-            f"\n"
-            f"with open('input.txt', 'r') as f:\n"
-            f"    text = f.read()\n"
-            f"\n\n"
-            f"# Part 1\n"
-            f"total = 0\n"
-            f"\n\n\n"
-            f"print(f'Part 1 : {{total}}')\n"
-            f"\n\n"
-            f"# Part 2\n"
-            f"total = 0\n"
-            f"\n\n\n"
-            f"print(f'Part 2 : {{total}}')\n"
-        )
-    print('\033[92m', end='') # Green
-    print(f"Created template for {year}/{day}")
-    print('\033[0m', end='')
+        with open('template.py', 'r') as template_file:
+            template_content = template_file.read()
+            f.write(template_content.replace("{year}", str(year)).replace("{day}", str(day)).replace("{author}", AUTHOR))
+    print(f'{GREEN}Created template for {year}/{day}{RESET}')
 else:
-    print('\033[93m', end='') # Yellow
-    print(f"File {year_directory}/{day_directory}/code.py already exists, ignoring...")
-    print('\033[0m', end='')
+    print(f'{YELLOW}File {year_directory}/{day_directory}/code.py already exists, ignoring...{RESET}')
