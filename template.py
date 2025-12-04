@@ -2,6 +2,8 @@
 # https://adventofcode.com/{year}/day/{day}
 # Author: {author}
 
+# Comment: ...
+
 # Parse input
 with open('input.txt', 'r') as f:
     text = f.read() # For text input
