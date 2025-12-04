@@ -2,6 +2,8 @@
 # https://adventofcode.com/2025/day/1
 # Author: Alexandre MALFREYT
 
+# Comment : part 2 is very naive not very optimized but works fine for the input size, could be improved with clever math but it's not my favorite kind of challenge
+
 from typing import Literal
 
 # Parse input

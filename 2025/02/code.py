@@ -2,9 +2,9 @@
 # https://adventofcode.com/2025/day/2
 # Author: Alexandre MALFREYT
 
-from typing import Literal
+# Comment : brute-force solution, kind of slow, i'm not sure how to optimize it but probably could be done
 
-from sympy import Li
+from typing import Literal
 
 # Parse input
 with open('input.txt', 'r') as f:
